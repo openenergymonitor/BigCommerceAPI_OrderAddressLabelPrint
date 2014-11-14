@@ -14,7 +14,7 @@ By Aled Ynyr Edwards
 https://github.com/ynyreds
 
 Used internally for running OpenEnergyMonitor shop
-http://shop.openenergymonitor.org
+http://shop.openenergymonitor.com
 
 
 
