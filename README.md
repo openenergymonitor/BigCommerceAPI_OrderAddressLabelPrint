@@ -7,7 +7,7 @@ show_order.rb - Ruby script using BigCommerce API, when passed an order ID numbe
 
 shop_download.rb - 
 
-Ruby script using BigCommerce API and glables to generate a printable pdf labels with shipping address, order ID, order sub-total and shipping type for all orders which are Awaiting Fulfilment 
+Ruby script using BigCommerce API and glables to generate a printable pdf labels with shipping address, order ID, order sub-total and shipping type for all orders which are Awaiting Fulfilment. Pdf label is then sent to Brother QL-500 label printer.
 
 
 By Aled Ynyr Edwards 
