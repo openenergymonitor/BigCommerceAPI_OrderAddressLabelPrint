@@ -1,5 +1,6 @@
 BigCommerceAPI_OrderAddressLabelPrint
 =====================================
+Used BigCommerce Ruby API: https://github.com/bigcommerce/bigcommerce-api-ruby
 
 Installation
 ============
@@ -18,6 +19,9 @@ shop_download.rb - Ruby script using BigCommerce API and glables to generate a p
 
 By Aled Ynyr Edwards 
 https://github.com/ynyreds
+
+Re-packaged using Ruby Gems by Frank Oxener 
+https://github.com/dovadi
 
 Used internally for running OpenEnergyMonitor shop
 http://shop.openenergymonitor.com
