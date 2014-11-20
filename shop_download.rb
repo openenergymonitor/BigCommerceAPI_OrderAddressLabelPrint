@@ -1,18 +1,13 @@
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-require_relative 'bigcommerce'
+require 'bigcommerce'
 require 'csv'
 
-
-
-  
 api = Bigcommerce::Api.new({
                              :store_url => "https://store-xxxxx.mybigcommerce.com/api/v2/",
                              :username  => "xxxxxxxxxxxxx",
                              :api_key   => "xxxxxxxxxxxxxxxxx"
                            })
 
-
-  CSV.open("order_addresses.csv","wb") do |csv|
+CSV.open("order_addresses.csv","wb") do |csv|
 
   @shop_orders = []
 
@@ -22,19 +17,18 @@ api = Bigcommerce::Api.new({
     @shop_orders =  api.get_orders(:status_id => '11')
   end
 
-  
+
   puts "Downloading..."
-  
-  @shop_orders.each do |order| 
-    
+
+  @shop_orders.each do |order|
+
     puts order["id"]
-    
+
     address = api.get_orders_shippingaddresses(order["id"])[0]
-    
 
     puts address["shipping_method"]
     shipping_method = "1st"
-    
+
    case address["shipping_method"]
       when /International Tracked/
       shipping_method = "TK"
@@ -49,7 +43,7 @@ api = Bigcommerce::Api.new({
       when /1st Class/
       shipping_method = "1st"
       else
-      shipping_method = "xx"      
+      shipping_method = "xx"
    end
 
     csv << [ address["first_name"],
@@ -68,6 +62,7 @@ api = Bigcommerce::Api.new({
              shipping_method
            ]
   end unless @shop_orders.nil?
+
 end
 
 puts
