@@ -11,8 +11,8 @@ CSV.open("order_addresses.csv","wb") do |csv|
 
   @shop_orders = []
 
-  if ARGV[0]
-    @shop_orders <<  api.get_order(ARGV[0].to_i)
+  if ARGV[1] #If two arguments printer and order ID
+    @shop_orders <<  api.get_order(ARGV[1].to_i) # second argument is order ID
   else
     @shop_orders =  api.get_orders(:status_id => '11')
   end
@@ -25,6 +25,7 @@ CSV.open("order_addresses.csv","wb") do |csv|
     puts order["id"]
 
     address = api.get_orders_shippingaddresses(order["id"])[0]
+
 
     puts address["shipping_method"]
     shipping_method = "1st"
@@ -62,17 +63,23 @@ CSV.open("order_addresses.csv","wb") do |csv|
              shipping_method
            ]
   end unless @shop_orders.nil?
-
 end
 
 puts
 puts "Generating labels"
 
-IO.popen('glabels-3-batch --input=order_addresses.csv ~/OrderDownload/MergeLabels.glabels') { |io| while (line = io.gets) do puts line end }
+IO.popen('glabels-3-batch --input=order_addresses.csv ~/OrderDownload/DK-2223-85.glabels') { |io| while (line = io.gets) do puts line end }
 
 puts
 puts "Sending to printer"
 
-IO.popen('lpr -P Brother_QL-500_server output.pdf') { |io| while (line = io.gets) do puts line end }
+
+  if ARGV[1] or  ARGV[0]  #If printer and order ID argument
+    IO.popen('lpr -P' + ARGV[0] + ' output.pdf') { |io| while (line = io.gets) do puts line end }
+    puts "Enter Brother_QL-500_server or QL-720NW (QL-720NW default)"
+  else
+    IO.popen('lpr -P QL-720NW output.pdf') { |io| while (line = io.gets) do puts line end }
+    puts "Enter Brother_QL-500_server or QL-720NW (QL-720NW default)"
+  end
 
 puts "Done!"
