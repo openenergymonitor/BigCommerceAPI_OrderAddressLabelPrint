@@ -5,8 +5,10 @@ Used BigCommerce Ruby API: https://github.com/bigcommerce/bigcommerce-api-ruby
 Installation
 ============
 
-* gem install bundler
-* bundle install
+`$ sudo apt-get update`
+`$ sudo apt-get install glabels`
+`$ gem install bundler`
+`$ bundle update && bundle install`
 
 Usage
 =====
