@@ -93,7 +93,7 @@ end
 puts "Sending to printer: " + @printer
 
 
-IO.popen('lpr -P '+@priner+' output.pdf') { |io| while (line = io.gets) do puts line end }
+IO.popen('lpr -P '+@printer+' '+@path+'/output.pdf') { |io| while (line = io.gets) do puts line end }
 
 
 puts "Success...let's go surfing!"
