@@ -1,36 +1,44 @@
+#!/usr/bin/ruby
+
 require 'bigcommerce'
 require 'csv'
 
-api = Bigcommerce::Api.new({
-                             :store_url => "https://store-xxxxx.mybigcommerce.com/api/v2/",
-                             :username  => "xxxxxxxxxxxxx",
-                             :api_key   => "xxxxxxxxxxxxxxxxx"
-                           })
+Bigcommerce.configure do |config|
+  config.auth = 'legacy'
+  config.url = ENV['BC_API_ENDPOINT_LEGACY']
+  config.username = ENV['BC_USERNAME']
+  config.api_key = ENV['BC_API_KEY']
+end
+
+
+@printer="pi-QL-720NW"
+@path=Dir.pwd
 
 CSV.open("order_addresses.csv","wb") do |csv|
 
   @shop_orders = []
+  @order = Bigcommerce::Order.all[0]
 
-  if ARGV[1] #If two arguments printer and order ID
-    @shop_orders <<  api.get_order(ARGV[1].to_i) # second argument is order ID
+  if ARGV[0] #If two arguments printer and order ID
+    @order.id = ARGV[0].to_i
+    puts "Getting order #" + @order.id.to_s
+    @shop_orders << Bigcommerce::Order.find(@order.id)
   else
-    @shop_orders =  api.get_orders(:status_id => '11')
+    puts "Getting all orders with 'Awaiting Fulfillment' status..."
+    @shop_orders =  Bigcommerce::Order.all(:status_id => '11')
   end
 
-
-  puts "Downloading..."
-
+  #puts @shop_orders
+  
+  
   @shop_orders.each do |order|
 
-    puts order["id"]
-
-    address = api.get_orders_shippingaddresses(order["id"])[0]
-
-
-    puts address["shipping_method"]
+    
+    address = Bigcommerce::OrderShippingAddress.all(order[:id])[0]
+    
     shipping_method = "1st"
-
-   case address["shipping_method"]
+   
+    case address[:shipping_method]
       when /International Tracked/
       shipping_method = "TK"
       when /International Standard/
@@ -45,41 +53,47 @@ CSV.open("order_addresses.csv","wb") do |csv|
       shipping_method = "1st"
       else
       shipping_method = "xx"
-   end
-
-    csv << [ address["first_name"],
-             address["last_name"],
-             address["company"],
-             address["street_1"],
-             address["street_2"],
-             address["city"],
-             address["state"],
-             address["zip"],
-             address["country"],
-             address["phone"],
-             order["id"],
-             sprintf("%.2f", order["subtotal_ex_tax"].to_f),
-             order["currency_code"],
+    end
+    puts order[:id].to_s + " > " + address[:shipping_method] + " '" + shipping_method +"'"
+    
+    csv << [ address[:first_name],
+             address[:last_name],
+             address[:company],
+             address[:street_1],
+             address[:street_2],
+             address[:city],
+             address[:state],
+             address[:zip],
+             address[:country],
+             address[:phone],
+             order[:id],
+             sprintf("%.2f", order[:subtotal_ex_tax].to_f),
+             order[:currency_code],
              shipping_method
            ]
-  end unless @shop_orders.nil?
-end
+    end unless @shop_orders.nil?
 
-puts
+#end CSV
+end
+  
+
 puts "Generating labels"
 
-IO.popen('glabels-3-batch --input=order_addresses.csv ~/OrderDownload/DK-2223-85.glabels') { |io| while (line = io.gets) do puts line end }
 
-puts
-puts "Sending to printer"
+# IO.popen('glabels-3-batch --input='+@path+'/order_addresses.csv '+@path+'/MergeLabels.glabels') { |io| while (line = io.gets) do puts line end }
+# IO.popen('glabels-3-batch --input='+@path+'/order_addresses.csv '+@path+'/MergeLabels.glabels >/dev/null')
+
+system('glabels-3-batch --input='+@path+'/order_addresses.csv '+@path+'/MergeLabels.glabels > /dev/null 2>&1')
+if $? == 0
+  puts "Success...label created"
+else
+  puts "Whoops...something went wrong :-("
+end
+
+puts "Sending to printer: " + @printer
 
 
-  if ARGV[1] or  ARGV[0]  #If printer and order ID argument
-    IO.popen('lpr -P' + ARGV[0] + ' output.pdf') { |io| while (line = io.gets) do puts line end }
-    puts "Enter Brother_QL-500_server or QL-720NW (QL-720NW default)"
-  else
-    IO.popen('lpr -P QL-720NW output.pdf') { |io| while (line = io.gets) do puts line end }
-    puts "Enter Brother_QL-500_server or QL-720NW (QL-720NW default)"
-  end
+IO.popen('lpr -P '+@priner+' output.pdf') { |io| while (line = io.gets) do puts line end }
 
-puts "Done!"
+
+puts "Success...let's go surfing!"
