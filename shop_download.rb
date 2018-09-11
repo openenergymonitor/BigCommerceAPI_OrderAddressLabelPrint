@@ -11,7 +11,7 @@ Bigcommerce.configure do |config|
 end
 
 
-@printer="pi-QL-720NW"
+@printer="pi-Brother_QL-720NW"
 @path=Dir.pwd
 
 CSV.open("order_addresses.csv","wb") do |csv|
@@ -29,15 +29,15 @@ CSV.open("order_addresses.csv","wb") do |csv|
   end
 
   #puts @shop_orders
-  
-  
+
+
   @shop_orders.each do |order|
 
-    
+
     address = Bigcommerce::OrderShippingAddress.all(order[:id])[0]
-    
+
     shipping_method = "1st"
-   
+
     case address[:shipping_method]
       when /International Tracked/
       shipping_method = "TK"
@@ -55,7 +55,7 @@ CSV.open("order_addresses.csv","wb") do |csv|
       shipping_method = "xx"
     end
     puts order[:id].to_s + " > " + address[:shipping_method] + " '" + shipping_method +"'"
-    
+
     csv << [ address[:first_name],
              address[:last_name],
              address[:company],
@@ -75,7 +75,7 @@ CSV.open("order_addresses.csv","wb") do |csv|
 
 #end CSV
 end
-  
+
 
 puts "Generating labels"
 
