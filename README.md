@@ -12,6 +12,8 @@ gem install bundler
 bundle install
 ```
 
+Tested with ruby 2.3.3 and glabels 3.4.1
+
 ## Setup credentials
 
 Using envioment variables add the following to:
