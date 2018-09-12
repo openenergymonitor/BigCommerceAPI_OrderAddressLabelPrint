@@ -14,19 +14,26 @@ bundle install
 
 ## Setup credentials
 
-Using envioment variables add the following to:
-
-`$ nano ~/.profile`
+"Save As&hellip;" `.env.example` as `.env` and alter the quotedvalues. Here's the examples:
 
 ```
-export BC_API_ENDPOINT_LEGACY="https://store-xxxxxx.mybigcommerce.com/api/v2/"
-export BC_USERNAME="xxxxx"
-export BC_API_KEY="xxxxxxx"
+BC_API_ENDPOINT_LEGACY="https://store-xxxxxx.mybigcommerce.com/api/v2/"
+BC_USERNAME="xxxxx"
+BC_API_KEY="xxxxxxx"
 ```
 
-Load the enviroment variables without having to logout/in:
+Include the `.env` file at the bottom of your `.profile` file:
 
-`. ~/.profile`
+```
+$ echo "[path to git repo]/.env" >> ~/.profile
+```
+
+
+Load the environment variables without having to logout/in:
+
+```
+. ~/.profile
+```
 
 # Usage
 =====
@@ -47,5 +54,38 @@ Used internally for running OpenEnergyMonitor shop
 http://shop.openenergymonitor.com
 
 
+# PHP GUI frontend
+This assumes that Apache and PHP are installed. If not, run this:
+```
+$ sudo apt install apache2 php
+$ sudo service apache2 restart
+```
 
+Create link to web directory in apache directory:
+```
+$ sudo ln -s [path to git repo]/web /var/www/html/bigcommerce
+```
 
+Access the frontend via a web browser:
+```
+http://[machine ip]/bigcommerce
+```
+---
+## Default site
+If no other sites are required you can make this script the default by changing the DocumentRoot in `/etc/apache2/sites-enabled/000-default.conf`:
+
+from
+```
+DocumentRoot /var/www/html
+```
+to 
+```
+DocumentRoot /var/www/html/bigcommerce
+```
+
+This script will then be available at :-
+```
+http://[machine ip]/
+```
+
+=====

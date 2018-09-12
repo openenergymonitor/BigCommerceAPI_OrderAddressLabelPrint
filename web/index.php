@@ -1,6 +1,8 @@
 <?php
-    define('validFileIncludeToggle',true);
-    include 'settings.php';
+    // load the settings from the .env file in the repo (ignored)
+    require __DIR__ . '/vendor/autoload.php';
+    $dotenv = new Dotenv\Dotenv(dirname(__DIR__));
+    $dotenv->load();
 
     /***
      * runs a ruby script with the big commerce api calls. settings stored in web/settings.php
@@ -14,6 +16,7 @@
     
     $errors[] = "";
     $output[] = "";
+    
     if($action = filter_input(INPUT_GET, "action", FILTER_SANITIZE_STRING)){
         
         // Call Ruby Script
@@ -30,17 +33,15 @@
             } else {
                 $order_number = "";
             }
-            $DIR = "/home/emrys/Documents/BigCommerceAPI_OrderAddressLabelPrint";// during development
-
             // add order number as ruby script input if available
-            $env = sprintf('BC_USERNAME=%s BC_API_KEY=%s BC_API_ENDPOINT_LEGACY=%s',$BC_USERNAME,$BC_API_KEY,$BC_API_ENDPOINT_LEGACY);
-            $command = $env .' '. sprintf('ruby %s/shop_download.rb %s 2>&1', $DIR, $order_number);
+            $env = sprintf('BC_USERNAME=%s BC_API_KEY=%s BC_API_ENDPOINT_LEGACY=%s',$_ENV['BC_USERNAME'],$_ENV['BC_API_KEY'],$_ENV['BC_API_ENDPOINT_LEGACY']);
+            $command = $env .' '. sprintf('ruby %s/shop_download.rb %s 2>&1', dirname(__DIR__), $order_number);
             $output[] = exec($command,$errors);
         // output usefull information for debugging
         } elseif($action == 'debug') {
             $output[] = "IP ADDRESS = {$_SERVER['SERVER_ADDR']}";
             $output[] = "WHOAMI = ".`whoami`;
-            $output[] = "SCRIPT DIR = $DIR";
+            $output[] = "SCRIPT DIR = ".dirname(__DIR__);
             $output[] = "CURRENT DIR = ".`pwd`;
             $output[] = "RUBY VERSION = " . `ruby -v`;
             $output[] = "PHP VERSION = " . `php -r 'echo phpversion();'`;
