@@ -39,10 +39,11 @@ Load the environment variables without having to logout/in:
 # Usage
 =====
 
-show_order.rb - Ruby script using BigCommerce API, when passed an order ID number all order info is displayed in json
-
-
 shop_download.rb - Ruby script using BigCommerce API and glables to generate a printable pdf labels with shipping address, order ID, order sub-total and shipping type for all orders which are Awaiting Fulfilment. Pdf label is then sent to Brother QL-500 label printer.
+
+To easily run using the '$ label' command create synlink 
+
+`$ sudo ln -s /home/pi/BigCommerceAPI_OrderAddressLabelPrint/label /usr/bin/`
 
 
 By Aled Ynyr Edwards

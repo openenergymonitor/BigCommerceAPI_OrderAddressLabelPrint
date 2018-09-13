@@ -106,7 +106,7 @@ puts "Generating labels"
 # IO.popen('glabels-3-batch --input='+@path+'/order_addresses.csv '+@path+'/MergeLabels.glabels') { |io| while (line = io.gets) do puts line end }
 # IO.popen('glabels-3-batch --input='+@path+'/order_addresses.csv '+@path+'/MergeLabels.glabels >/dev/null')
 
-system('glabels-3-batch --input='+@path+'/order_addresses.csv '+@path+'/MergeLabels.glabels > /dev/null 2>&1')
+system('glabels-3-batch --input='+@path+'/order_addresses.csv '+@path+'/MergeLabels.glabels --output='+@path+'/output.pdf > /dev/null 2>&1')
 if $? == 0
   puts "Success...label created"
 else
