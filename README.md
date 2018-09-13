@@ -22,17 +22,18 @@ BC_USERNAME="xxxxx"
 BC_API_KEY="xxxxxxx"
 ```
 
-Include the `.env` file at the bottom of your `.profile` file:
+Add the following lines to the end of your `.bashrc` file to include make the above variables available to the scripts
 
 ```
-$ echo "[path to git repo]/.env" >> ~/.profile
+if [ -f [path to repo]/.env ] ; then
+    . [path to repo]/.env
+fi
 ```
-
 
 Load the environment variables without having to logout/in:
 
 ```
-. ~/.profile
+. ~/.bashrc
 ```
 
 # Usage
@@ -61,9 +62,10 @@ $ sudo apt install apache2 php
 $ sudo service apache2 restart
 ```
 
-Create link to web directory in apache directory:
+Create link to the repo's `web` directory in the apache html directory called `bigcommerce`:
 ```
-$ sudo ln -s [path to git repo]/web /var/www/html/bigcommerce
+$ cd [path to repo]
+$ sudo ln -s $PWD/web /var/www/html/bigcommerce
 ```
 
 Access the frontend via a web browser:
@@ -71,7 +73,7 @@ Access the frontend via a web browser:
 http://[machine ip]/bigcommerce
 ```
 ---
-## Default site
+## Default site (no sub directory path)
 If no other sites are required you can make this script the default by changing the DocumentRoot in `/etc/apache2/sites-enabled/000-default.conf`:
 
 from
@@ -81,6 +83,11 @@ DocumentRoot /var/www/html
 to 
 ```
 DocumentRoot /var/www/html/bigcommerce
+```
+
+Restart apache 
+```
+$ sudo service apache2 restart 
 ```
 
 This script will then be available at :-

@@ -2,6 +2,7 @@
 
 require 'bigcommerce'
 require 'csv'
+require 'json'
 
 Bigcommerce.configure do |config|
   config.auth = 'legacy'
@@ -10,19 +11,41 @@ Bigcommerce.configure do |config|
   config.api_key = ENV['BC_API_KEY']
 end
 
-
 @printer="pi-Brother_QL-720NW"
 @path=Dir.pwd
 
-CSV.open("order_addresses.csv","wb") do |csv|
+# if 1 param passed and is not integer - it is the path
+# if 1 param passed and is an integer - it is the order id
+# if 2 param passed the first is the path, second is the id
+# if 0 param passed the path is the current directory
+
+if ARGV[0].to_i.to_s == ARGV[0].to_s
+  @order_id = ARGV[0].to_i
+else
+  @path = ARGV[0].to_s
+end
+
+if ARGV[1] && !ARGV[1].empty?
+  @order_id = ARGV[0].to_i
+end
+
+CSV.open(@path+"/order_addresses.csv","wb") do |csv|
 
   @shop_orders = []
   @order = Bigcommerce::Order.all[0]
 
-  if ARGV[0] #If two arguments printer and order ID
-    @order.id = ARGV[0].to_i
+  if @order_id && @order_id > 0
+    @order.id = @order_id
     puts "Getting order #" + @order.id.to_s
-    @shop_orders << Bigcommerce::Order.find(@order.id)
+    begin
+      @shop_orders << Bigcommerce::Order.find(@order.id)
+    rescue StandardError => e
+      # unexpected returned message from api
+      JSON.parse(e.message).each do |message|
+        puts message["message"]
+      end
+      exit
+    end
   else
     puts "Getting all orders with 'Awaiting Fulfillment' status..."
     @shop_orders =  Bigcommerce::Order.all(:status_id => '11')
@@ -93,7 +116,7 @@ end
 puts "Sending to printer: " + @printer
 
 
-# IO.popen('lpr -P '+@printer+' '+@path+'/output.pdf') { |io| while (line = io.gets) do puts line end }
+IO.popen('lpr -P '+@printer+' '+@path+'/output.pdf') { |io| while (line = io.gets) do puts line end }
 
 
 puts "Success...let's go surfing!"
