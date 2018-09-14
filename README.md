@@ -14,7 +14,7 @@ bundle install
 
 ## Setup credentials
 
-"Save As&hellip;" `.env.example` as `.env` and alter the quotedvalues. Here's the examples:
+"Save As&hellip;" `.env.example` as `.env` and alter the quoted values. Here's the examples:
 
 ```
 BC_API_ENDPOINT_LEGACY="https://store-xxxxxx.mybigcommerce.com/api/v2/"
@@ -22,7 +22,7 @@ BC_USERNAME="xxxxx"
 BC_API_KEY="xxxxxxx"
 ```
 
-Add the following lines to the end of your `.bashrc` file to include make the above variables available to the scripts
+Add the following lines to the end of your `.bashrc` file to make the above variables available to the scripts
 
 ```
 if [ -f [path to repo]/.env ] ; then
@@ -55,6 +55,8 @@ https://github.com/dovadi
 Used internally for running OpenEnergyMonitor shop
 http://shop.openenergymonitor.com
 
+Altered by Emrys Roberts 2018-09-13
+https://github.com/emrysr
 
 # PHP GUI frontend
 This assumes that Apache and PHP are installed. If not, run this:
