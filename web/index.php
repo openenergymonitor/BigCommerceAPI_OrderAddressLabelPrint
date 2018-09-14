@@ -41,17 +41,34 @@
         // output useful information for debugging
         } elseif($action == 'debug') {
             $output[] = "IP ADDRESS = {$_SERVER['SERVER_ADDR']}";
+            $output[] = "HOSTNAME = ".gethostname();
             $output[] = "WHOAMI = ".`whoami`;
             $output[] = "SCRIPT DIR = ".dirname(__DIR__);
-            $output[] = "CURRENT DIR = ".`pwd`;
+            $output[] = "APACHE DIR = ".str_replace( '/index.php', '', $_SERVER['SCRIPT_FILENAME'] )."\n";
             $output[] = "RUBY VERSION = " . `ruby -v`;
             $output[] = "PHP VERSION = " . `php -r 'echo phpversion();'`;
             $output[] = "APACHE VERSION = " . `apache2 -v`;
             $output[] = "UBUNTU VERSION = " . `lsb_release -d`;
         
+        // output phpinfo
+        } elseif($action == 'phpinfo') {
+            ob_start();
+            phpinfo();
+            $output_raw[] = ob_get_contents();
+            ob_clean();
+            
+            $output_raw[] = "<style>
+            body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji'!important;}
+            a { background:transparent!important; }
+            h1 { font-size:2.5rem!important; }
+            .raw h1 { font-size:1.5rem!important; }
+
+            </style>";
+
+
         // get total awaiting approval via ruby script
         } elseif($action == 'orders') {
-            $command = sprintf('ruby %s/awaiting_fulfilment.rb', dirname(__DIR__));
+            $command = sprintf('ruby %s/awaiting_fulfillment.rb', dirname(__DIR__));
             $result = exec($command,$output);
             $jsonString = implode("\n",$output);
             $json = json_decode($jsonString,true);
@@ -86,6 +103,7 @@
         line-height: 60px; /* Vertically center the text there */
         background-color: #f5f5f5;
     }
+
     </style>
 </head>
 <body>
@@ -95,14 +113,15 @@
                 <div class="row">
                     <div class="col-sm-8 col-md-7 py-4">
                         <h4 class="text-white">About</h4>
-                        <p class="text-muted">Interact with BigCommerce to produce delivery lables for orders awaiting fulfilment.</p>
+                        <p class="text-muted">Interact with BigCommerce to produce delivery lables for orders awaiting fulfillment.</p>
                     </div>
                     <div class="col-sm-4 offset-md-1 py-4">
                         <h4 class="text-white">Links</h4>
                         <ul class="list-unstyled">
+                            <li><a href="<?php echo str_replace( 'index.php', '', $_SERVER['PHP_SELF'] ) ?>" class="text-white">Reload</a></li>
                             <li><a href="https://github.com/openenergymonitor/BigCommerceAPI_OrderAddressLabelPrint" class="text-white">Github</a></li>
                             <li><a href="?action=debug" class="text-white">Debug</a></li>
-                            <li><a href="info.php" class="text-white">PHP info</a></li>
+                            <li><a href="?action=phpinfo" class="text-white">PHP info</a></li>
                         </ul>
                     </div>
                 </div>
@@ -125,7 +144,7 @@
         <section class="jumbotron text-center">
             <div class="container">
                 <h1 class="jumbotron-heading"><a class="text-body" href="<?php echo str_replace( 'index.php', '', $_SERVER['PHP_SELF'] ) ?>">Address Labels</a></h1>
-                <p class="lead text-muted">Print all labels awaiting fulfilment, or print individual label based on order number.</p>
+                <p class="lead text-muted">Print all labels awaiting fulfillment, or print individual label based on order number.</p>
                     <div class="btn-group" role="group" aria-label="Basic example">
                         <form class="mr-1">
                             <input type="hidden" name="action" value="print_all">
@@ -143,20 +162,27 @@
                     </div> 
                 </form>
 
+                <?php if (!empty($output)) : ?>
                 <pre class="text-left d-flex justify-content-center"><?php echo implode("\n",$output); ?></pre>
+                <?php endif; ?>
+
+                <?php if (!empty($output_raw)) : ?>
+                <div class="raw text-left d-flex justify-content-center"><?php echo implode("\n",$output_raw); ?></div>
+                <?php endif; ?>
 
                 <?php if(!empty($errors)): ?>
                     <h4 title="Error running the following command:\n <?php echo $command ?>">Error:</h4>
                     <pre class="text-left d-flex justify-content-center"><?php echo implode("\n",$errors); ?></pre>
                 <?php endif; ?>
+                
             </div>
         </section>
         <section id="list">
             <div class="container">
-                <h4 id="list_title" class="text-center"><button class="btn btn-outline-primary" onclick="getOrderAwaitingFulfillment()">Get List of Orders Awaiting Fulfillment</button></h4>
+                <h4 id="list_title" class="text-center"></h4>
                 <div class="d-flex justify-content-center">
-                    <div id="order-list" class="list-group text-left col-sm-6 p-0 mb-5"></div>
-                    <template id="order-list-items">
+                    <div id="orders-list" class="list-group text-left col-sm-6 p-0 mb-5"></div>
+                    <template id="orders-list-items">
                         <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                             <div class="d-flex w-100 justify-content-between">
                                 <h5 class="mb-1">
@@ -179,33 +205,43 @@
     
     <footer class="text-muted footer">
         <div class="container">
-            <p class="text-center"><abbr title="GNU GPL">🄯</abbr> OpenEnergyMonitor. Source on <a href="https://github.com/openenergymonitor"> on Github</a>.</p>
+            <p class="text-center mb-0"><abbr title="GNU GPL">🄯</abbr> OpenEnergyMonitor. Source on <a href="https://github.com/openenergymonitor"> on Github</a>.</p>
         </div>
     </footer>
     
-    <script src="assets/jquery.slim.min.js"></script>
+    <script src="assets/jquery-3.3.1.min.js"></script>
     <script src="assets/popper.min.js"></script>
     <script src="assets/bootstrap.min.js"></script>
     <script src="assets/moment.min.js"></script>
     <script>
+
+        var xhr,
+            reloadButton = '<button class="btn btn-outline-primary" onclick="getOrderAwaitingFulfillment()">Reload</button>',
+            cancelButton = '<btn id="cancel" onclick="cancelDownload()" title="Cancel Download&hellip;" class="btn btn-outline-secondary">Loading list&hellip;</btn>',
+            loadButton = '<button class="btn btn-outline-primary" onclick="getOrderAwaitingFulfillment()">Get List of Orders Awaiting Fulfillment</button>',
+            listTitle = document.getElementById('list_title'),
+            list = document.getElementById('orders-list'),
+            printAllButton = document.getElementById('printAllButton'),
+            listItemTemplate = document.getElementById('orders-list-items')
+
         function getOrderAwaitingFulfillment(){
-            document.getElementById('list_title').innerHTML = "Loading list&hellip;"
+            clearList()
+            listTitle.innerHTML = cancelButton;
             // get the details regarding the orders via an AJAX call
-            var xhr = new XMLHttpRequest()
+            xhr = new XMLHttpRequest()
             xhr.open('GET', '?action=orders')
             xhr.setRequestHeader('Content-Type', 'application/json')
             xhr.onload = function() {
                 if (xhr.status === 200) {
                     let orderStatus = JSON.parse(xhr.responseText)
                     if (orderStatus.orders.length>0) {
-                        document.getElementById('printAllButton').title = orderStatus.orders.length + ' orders ' + orderStatus.name
-                        document.getElementById('list_title').innerHTML = 'Orders '+ orderStatus.name + ': ('+orderStatus.orders.length+')'
-                        let list = document.getElementById('order-list')
+                        printAllButton.title = orderStatus.orders.length + ' orders ' + orderStatus.name
+                        listTitle.innerHTML = 'Orders '+ orderStatus.name + ': ('+orderStatus.orders.length+')'+ ' '+reloadButton
                         orderStatus.orders.forEach(function (order) {
                             // console.log(order)
                             listItem = document.createElement('div')
-                            listItemTemplate = document.getElementById('order-list-items').innerHTML
-                            listItem.innerHTML = listItemTemplate
+                            listItemHTML = listItemTemplate.innerHTML
+                            listItem.innerHTML = listItemHTML
                             listItem.querySelector('.customer_message').innerText = order.customer_message
                             listItem.querySelector('.email').innerText = order.billing_address.email
                             listItem.querySelector('.country').innerText = order.geoip_country_iso2
@@ -216,15 +252,17 @@
                             listItem.querySelector('.date').innerText = moment(order.date_created).fromNow()
                             listItem.querySelector('.date').title = order.date_created
                             list.appendChild(listItem.firstElementChild)
+                            showList()
                         })
                     } else {
-                        document.getElementById('list_title').innerHTML = 'No orders ' + orderStatus.name + ' <button class="btn btn-outline-primary" onclick="getOrderAwaitingFulfillment()">Reload</button>'
+                        listTitle.innerHTML = 'No orders ' + orderStatus.name + ' '+reloadButton
                     }
                 }
             }
             xhr.send()
         }
-        // getOrderAwaitingFulfillment();
+        listTitle.innerHTML = loadButton
+        
         // return the closest match up the DOM from the elem to the given selector. null if not found
         var getClosest = function ( elem, selector ) {
             if ( elem.matches( selector ) ) return elem
@@ -240,6 +278,15 @@
             let symbols = {GBP: '£', EUR: '€', USD: '$'}
             return (symbols[currency]||'') + Number(amount).toFixed(2) + (!symbols[currency] ? ' ('+currency+')': '')
         }
+
+        var cancelDownload = function(){
+            xhr.abort()
+            listTitle.innerHTML = 'Download cancelled  '+reloadButton
+            clearList()
+        }
+
+        var clearList = function(){ $(list).slideUp('slow', function(){ $(this).html('') }) }
+        var showList = function(){ $(list).slideDown('fast') }
 
         //populate the search field on click of the list items
         document.addEventListener('click', function(event) {
