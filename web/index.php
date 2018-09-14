@@ -179,7 +179,7 @@
     
     <footer class="text-muted footer">
         <div class="container">
-            <p class="text-center">🄯 OpenEnergyMonitor. Source on <a href="https://github.com/openenergymonitor"> on Github</a>.</p>
+            <p class="text-center"><abbr title="GNU GPL">🄯</abbr> OpenEnergyMonitor. Source on <a href="https://github.com/openenergymonitor"> on Github</a>.</p>
         </div>
     </footer>
     
