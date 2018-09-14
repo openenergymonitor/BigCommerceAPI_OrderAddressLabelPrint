@@ -12,6 +12,7 @@ Used BigCommerce Ruby API: https://github.com/bigcommerce/bigcommerce-api-ruby
 - PHP - to run the web frontend
 - Apache - to host the web frontend
 - gLabels - to produce the PDF for printing
+- Brother QL-720NW label printer connected via USB (installed using CUPS)
 
 ### Install commands:
 
@@ -79,6 +80,16 @@ https://github.com/emrysr
 
 =====
 
+# Alternate printer
+Currently the ruby script `show_download.rb` prints to a printer called `pi-Brother_QL-720NW`.
+
+Modify the ruby script with the new printer name as shown in CUPS. A new `MergeLabels.glabels` file should be created using the correct label layout for the new printer.
+```
+$ glables-3
+```
+
+The default CUPS config can be accessed on the manchine it's installed on:
+[http://localhost:631/admin](http://localhost:631/admin)
 
 # GUI frontend
 =====
