@@ -88,8 +88,7 @@ $ sudo service apache2 restart
 
 Create link to the repo's `web` directory in the apache html directory called `bigcommerce`:
 ```
-$ cd [path to repo]
-$ sudo ln -s $PWD/web /var/www/html/bigcommerce
+$ sudo ln -s [path to repo]/web /var/www/html/bigcommerce
 ```
 
 Access the frontend via a web browser:
