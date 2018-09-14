@@ -155,7 +155,7 @@
             <div class="container">
                 <h4 id="list_title" class="text-center"><button class="btn btn-outline-primary" onclick="getOrderAwaitingFulfillment()">Get List of Orders Awaiting Fulfillment</button></h4>
                 <div class="d-flex justify-content-center">
-                    <div id="order-list" class="list-group text-left col-sm-6 p-0"></div>
+                    <div id="order-list" class="list-group text-left col-sm-6 p-0 mb-5"></div>
                     <template id="order-list-items">
                         <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                             <div class="d-flex w-100 justify-content-between">
@@ -199,7 +199,7 @@
                     let orderStatus = JSON.parse(xhr.responseText)
                     if (orderStatus.orders.length>0) {
                         document.getElementById('printAllButton').title = orderStatus.orders.length + ' orders ' + orderStatus.name
-                        document.getElementById('list_title').innerHTML = orderStatus.name + ' ('+orderStatus.orders.length+')'
+                        document.getElementById('list_title').innerHTML = 'Orders '+ orderStatus.name + ': ('+orderStatus.orders.length+')'
                         let list = document.getElementById('order-list')
                         orderStatus.orders.forEach(function (order) {
                             // console.log(order)
