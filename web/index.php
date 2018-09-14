@@ -247,7 +247,7 @@
                             listItem.querySelector('.country').innerText = order.geoip_country_iso2
                             listItem.querySelector('.country').title = order.geoip_country
                             listItem.querySelector('.customer_name').innerText = order.billing_address.last_name +', '+order.billing_address.first_name.substr(0,1)
-                            listItem.querySelector('.customer_name').title = 'total= '+format_currency(order.total_inc_tax, order.currency_code) + ' [shipping= '+format_currency(order.shipping_cost_inc_tax)+']'
+                            listItem.querySelector('.customer_name').title = order.billing_address.last_name +', '+order.billing_address.first_name + ', {Ex. Tax= '+format_currency(order.subtotal_ex_tax, order.currency_code) + '} [shipping= '+format_currency(order.shipping_cost_inc_tax)+']'
                             listItem.querySelector('.order_number').innerText = order.id
                             listItem.querySelector('.date').innerText = moment(order.date_created).fromNow()
                             listItem.querySelector('.date').title = order.date_created
