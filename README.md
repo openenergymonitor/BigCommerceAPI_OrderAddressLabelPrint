@@ -16,10 +16,13 @@ Used BigCommerce Ruby API: https://github.com/bigcommerce/bigcommerce-api-ruby
 ### Install commands:
 
 ```
-sudo apt-get update
-sudo apt-get install glables
-gem install bundler
-bundle install
+$ sudo apt-get update
+$ sudo apt-get install glables
+$ sudo apt-get install git
+$ git clone https://github.com/openenergymonitor/BigCommerceAPI_OrderAddressLabelPrint.git
+$ cd BigCommerceAPI_OrderAddressLabelPrint
+$ gem install bundler
+$ bundle install
 ```
 
 ## Setup credentials
@@ -28,7 +31,7 @@ bundle install
 >
 > eg: */home/pi/BigCommerceAPI_OrderAddressLabelPrint*
 
-"Save As&hellip;" `.env.example` as `.env` and alter the quoted values. Here's the examples:
+"Save As&hellip;" `.env.example` as `.env` and alter the quoted values with your own BigCommerce API credentials. Here's an examples:
 
 ```
 BC_API_ENDPOINT_LEGACY="https://store-xxxxxx.mybigcommerce.com/api/v2/"
@@ -77,16 +80,15 @@ https://github.com/emrysr
 =====
 
 
-# PHP GUI frontend
+# GUI frontend
 =====
 
-This assumes that Apache and PHP are installed. If not, run this:
+The GUI runs in a PHP script. If Apache and PHP are not installed install them like this:
 ```
-$ sudo apt install apache2 php
-$ sudo service apache2 restart
+$ sudo apt-get update && sudo apt-get install apache2 php
 ```
 
-Create link to the repo's `web` directory in the apache html directory called `bigcommerce`:
+Create a symbolic link to the repo's `web` directory in the apache `html` directory called `bigcommerce`:
 ```
 $ sudo ln -s [path to repo]/web /var/www/html/bigcommerce
 ```
@@ -101,13 +103,14 @@ If no other sites are required you can make this script the default by changing 
 
 Change from `/var/www/html` to `/var/www/html/bigcommerce` 
 
-### Restart apache 
+### Restart Apache 
+
+Restart Apache to set the changes:
 ```
 $ sudo service apache2 restart 
 ```
 
-### Web browser
-This script will then be available at :-
+Access the frontend via a web browser (without the directory name):
 ```
 http://[machine ip]/
 ```
