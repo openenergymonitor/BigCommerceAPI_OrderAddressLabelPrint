@@ -21,12 +21,6 @@ end
 
 if ARGV[0].to_i.to_s == ARGV[0].to_s
   @order_id = ARGV[0].to_i
-else
-  @path = ARGV[0].to_s
-end
-
-if ARGV[1] && !ARGV[1].empty?
-  @order_id = ARGV[0].to_i
 end
 
 CSV.open("/tmp/order_addresses.csv","wb") do |csv|
@@ -51,7 +45,13 @@ CSV.open("/tmp/order_addresses.csv","wb") do |csv|
     @shop_orders =  Bigcommerce::Order.all(:status_id => '11')
   end
 
-  #puts @shop_orders
+  # puts @shop_orders
+  # puts @order_id
+
+  if (@shop_orders.length<1)
+    puts "No orders Awiating Fulfilment :-)"
+    exit
+  end
 
 
   @shop_orders.each do |order|
