@@ -13,7 +13,6 @@ end
 
 @printer="pi-Brother_QL-720NW"
 # path is passed to script if ran from php.
-@path=Dir.pwd
 
 # if 1 param passed and is not integer - it is the path
 # if 1 param passed and is an integer - it is the order id
@@ -30,7 +29,7 @@ if ARGV[1] && !ARGV[1].empty?
   @order_id = ARGV[0].to_i
 end
 
-CSV.open(@path+"/order_addresses.csv","wb") do |csv|
+CSV.open("/tmp/order_addresses.csv","wb") do |csv|
 
   @shop_orders = []
   @order = Bigcommerce::Order.all[0]
@@ -107,7 +106,8 @@ puts "Generating labels"
 # IO.popen('glabels-3-batch --input='+@path+'/order_addresses.csv '+@path+'/MergeLabels.glabels') { |io| while (line = io.gets) do puts line end }
 # IO.popen('glabels-3-batch --input='+@path+'/order_addresses.csv '+@path+'/MergeLabels.glabels >/dev/null')
 
-system('glabels-3-batch --input='+@path+'/order_addresses.csv '+__dir__+'/MergeLabels.glabels --output='+@path+'/output.pdf > /dev/null 2>&1')
+system('glabels-3-batch --input=/tmp/order_addresses.csv '+__dir__+'/MergeLabels.glabels --output=/tmp/output.pdf > /dev/null 2>&1')
+
 if $? == 0
   puts "Success...label created"
 else
@@ -117,7 +117,7 @@ end
 puts "Sending to printer: " + @printer
 
 
-IO.popen('lpr -P '+@printer+' '+@path+'/output.pdf') { |io| while (line = io.gets) do puts line end }
+IO.popen('lpr -P '+@printer+' /tmp/output.pdf') { |io| while (line = io.gets) do puts line end }
 
 
 puts "Success...let's go surfing!"
