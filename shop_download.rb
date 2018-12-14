@@ -49,7 +49,7 @@ CSV.open("/tmp/order_addresses.csv","wb") do |csv|
   # puts @order_id
 
   if (@shop_orders.length<1)
-    puts "No orders Awiating Fulfilment :-)"
+    puts "No orders Awaiting Fulfillment :-)"
     exit
   end
 
@@ -64,6 +64,8 @@ CSV.open("/tmp/order_addresses.csv","wb") do |csv|
     case address[:shipping_method]
       when /International Tracked/
       shipping_method = "TK"
+      when /International Signed/
+      shipping_method = "SIG"
       when /International Standard/
       shipping_method = "IS"
       when /Special/
@@ -79,6 +81,14 @@ CSV.open("/tmp/order_addresses.csv","wb") do |csv|
     end
     puts order[:id].to_s + " > " + address[:shipping_method] + " '" + shipping_method +"'"
 
+    phone_number  = address[:phone]    
+    order_amount  = sprintf("%.2f", order[:subtotal_ex_tax].to_f)
+    
+    if shipping_method == "1st" || shipping_method == "SD"
+    	phone_number = ""
+        order_amount = ""
+    end
+
     csv << [ address[:first_name],
              address[:last_name],
              address[:company],
@@ -88,9 +98,11 @@ CSV.open("/tmp/order_addresses.csv","wb") do |csv|
              address[:state],
              address[:zip],
              address[:country],
-             address[:phone],
+             #address[:phone],
+             phone_number,
              order[:id],
-             sprintf("%.2f", order[:subtotal_ex_tax].to_f),
+             order_amount,
+             #sprintf("%.2f", order[:subtotal_ex_tax].to_f),
              order[:currency_code],
              shipping_method
            ]
