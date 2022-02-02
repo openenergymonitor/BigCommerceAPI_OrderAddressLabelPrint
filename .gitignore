@@ -4,3 +4,4 @@ order_addresses.csv
 web/settings.php
 web/.env
 .env
+web/shop_labels/

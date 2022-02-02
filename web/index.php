@@ -1,3 +1,4 @@
+
 <?php
     // load the settings from the .env file in the repo (ignored)
     require __DIR__ . '/vendor/autoload.php';
@@ -35,7 +36,7 @@
             $command = sprintf('LC_ALL=en_GB.UTF-8 ruby %s/shop_download.rb %s %s 2>&1', dirname(__DIR__), $order_number, dirname($_SERVER['SCRIPT_FILENAME']));
             $last_line = exec($command,$output);
 
-            if($last_line !== "Success...let's go surfing!"){
+            if($last_line !== "Done"){
                 $errors[] = array_pop($output);
             }
             echo(json_encode(array('errors'=>$errors,'command'=>$command,'last_line'=>$last_line,'output'=>$output)));
@@ -231,8 +232,16 @@
                 </template>
             </div>
         </section>
-
-    </main>
+	<div style="width: 100%;">
+            <div style="margin:0 auto;width: 400px;text-align:center">
+		<a href="shop_labels" style="border-radius:5px;text-align:center;background-color:blue;
+                border:2px solid #FFA500;padding:10px;color:white;margin: 0 auto;">Hardware & Packaging Labels</a>
+                <a href="http://192.168.0.110:57575/session/996ea13a-ef6d-4dad-834e-6723b26cc65e" 
+                style="border-radius:5px;text-align:center;background-color:red;
+                border:2px solid #FFA500;padding:10px;color:white;margin: 0 auto;">emonUpload</a>
+       	    </div>
+        </div>
+  </main>
 
     <footer class="text-muted footer">
         <div class="container">

@@ -65,17 +65,17 @@ CSV.open("/tmp/order_addresses.csv","wb") do |csv|
       when /International Tracked/
       shipping_method = "TK"
       when /International Signed/
-      shipping_method = "SIG"
+      shipping_method = "SG"
       when /International Standard/
       shipping_method = "IS"
-      when /Special/
+      when /Royal Mail Tracked/
       shipping_method = "SD"
       when /UPS/
       shipping_method = "UPS"
       when /International Shipping/
       shipping_method = "CO"
-      when /1st Class/
-      shipping_method = "1st"
+      when /Royal Mail Standard/
+      shipping_method = "RM"
       else
       shipping_method = "xx"
     end
@@ -83,11 +83,20 @@ CSV.open("/tmp/order_addresses.csv","wb") do |csv|
 
     phone_number  = address[:phone]    
     order_amount  = sprintf("%.2f", order[:subtotal_ex_tax].to_f)
+    zip_code = address[:zip]
+    country = address[:country]
     
-    if shipping_method == "1st" || shipping_method == "SD"
-    	phone_number = ""
+    if shipping_method == "RM" || shipping_method == "SD"
+      phone_number = ""
+      if zip_code[0...2].upcase.include? "BT"
+        country = "Northern Ireland"
+      else
         order_amount = ""
+      end
     end
+
+    # check if address is in Northern Ireland (needs customs form post Brexit)
+    # remove phone number and order amount if not needed (for UK orders)
 
     csv << [ address[:first_name],
              address[:last_name],
@@ -96,8 +105,8 @@ CSV.open("/tmp/order_addresses.csv","wb") do |csv|
              address[:street_2],
              address[:city],
              address[:state],
-             address[:zip],
-             address[:country],
+             zip_code,
+             country,
              #address[:phone],
              phone_number,
              order[:id],
@@ -132,4 +141,4 @@ puts "Sending to printer: " + @printer
 IO.popen('lpr -P '+@printer+' /tmp/output.pdf') { |io| while (line = io.gets) do puts line end }
 
 
-puts "Success...let's go surfing!"
+puts "Done"
